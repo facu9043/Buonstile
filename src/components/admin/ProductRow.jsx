@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Check, ToggleLeft, ToggleRight, UploadCloud, Loader2 } from "lucide-react";
 import ProductImage from "../ProductImage";
 import { SIZES, CATEGORIES } from "../../data/products";
@@ -14,6 +14,7 @@ export default function ProductRow({ product, onUpdated }) {
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [togglingActive, setTogglingActive] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleSave = async () => {
     setSaving(true);
@@ -45,10 +46,7 @@ export default function ProductRow({ product, onUpdated }) {
     }
   };
 
-  const handleDrop = async (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
+  const handleFile = async (file) => {
     if (!file || !file.type.startsWith("image/")) return;
     setUploading(true);
     try {
@@ -59,19 +57,36 @@ export default function ProductRow({ product, onUpdated }) {
     }
   };
 
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleFile(e.dataTransfer.files?.[0]);
+  };
+
   return (
     <tr className="border-b border-line align-middle">
       <td className="p-3">
         <div
+          onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => {
             e.preventDefault();
             setDragOver(true);
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          className="relative w-16 h-16 border border-ink bg-paper overflow-hidden shrink-0"
+          className="relative w-16 h-16 border border-ink bg-paper overflow-hidden shrink-0 cursor-pointer"
           style={{ outline: dragOver ? "2px dashed #0D0D0D" : "none" }}
         >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              handleFile(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
           <ProductImage image={product.image} pattern={product.pattern} alt={product.name} />
           <div className="absolute inset-0 flex items-center justify-center bg-ink/0 hover:bg-ink/60 transition-colors group">
             {uploading ? (
