@@ -1,0 +1,21 @@
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+
+export default function RequireAuth({ children }) {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center py-24">
+        <p className="text-xs tracking-widest uppercase text-stone font-mono">Cargando...</p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  return children;
+}
