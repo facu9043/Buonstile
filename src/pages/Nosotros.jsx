@@ -1,7 +1,6 @@
 import React from "react";
 import { MapPin, Sparkles, Users, Wind, MessageCircle } from "lucide-react";
 import { WHATSAPP_NUMBER, STORE_ADDRESS } from "../data/brand";
-import { patternBg } from "../components/patterns";
 
 const VALUES = [
   {
@@ -55,9 +54,12 @@ export default function Nosotros() {
             para que armes tu propia combinacion y salgas con tu propio flow.
           </p>
         </div>
-        <div className="relative h-72 md:h-96 border border-ink flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: patternBg("stripes") }} />
-          <img src="/logo.png" alt="Buonstile" className="relative h-32 w-32 md:h-40 md:w-40 object-contain" />
+        <div className="relative h-72 md:h-96 border border-ink overflow-hidden">
+          <img
+            src="/nosotros-estilo.jpg"
+            alt="Clientes de Buonstile usando remeras oversize de la marca"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </div>
       </section>
 
