@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, Check } from "lucide-react";
-import { SIZES, productStatus } from "../data/products";
+import { SIZES, productStatus, sizeLabel } from "../data/products";
 import { fetchProductById } from "../data/productsApi";
 import StockBadge from "../components/StockBadge";
 import ProductImage from "../components/ProductImage";
@@ -72,7 +72,7 @@ export default function ProductoDetalle() {
                     setSize(s);
                     setQty(1);
                   }}
-                  className="relative w-12 h-12 flex items-center justify-center text-sm font-bold border font-mono"
+                  className="relative min-w-12 h-12 px-2 flex items-center justify-center text-sm font-bold border font-mono whitespace-nowrap"
                   style={{
                     color: disabled ? "#C7C5BD" : "#0D0D0D",
                     borderColor: disabled ? "#DCDAD3" : "#0D0D0D",
@@ -80,7 +80,7 @@ export default function ProductoDetalle() {
                     cursor: disabled ? "not-allowed" : "pointer",
                   }}
                 >
-                  {s}
+                  {sizeLabel(product.category, s)}
                   <BrushCircle active={size === s} />
                 </button>
               );

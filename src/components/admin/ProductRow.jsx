@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Check, ToggleLeft, ToggleRight, UploadCloud, Loader2 } from "lucide-react";
 import ProductImage from "../ProductImage";
-import { SIZES, CATEGORIES } from "../../data/products";
+import { SIZES, CATEGORIES, sizeLabel } from "../../data/products";
 import { updateProduct, toggleActive, uploadProductImage } from "../../data/productsApi";
 
 export default function ProductRow({ product, onUpdated }) {
@@ -133,7 +133,9 @@ export default function ProductRow({ product, onUpdated }) {
         <div className="flex gap-1.5">
           {SIZES.map((s) => (
             <label key={s} className="flex flex-col items-center gap-0.5">
-              <span className="text-[9px] uppercase text-stone font-mono">{s}</span>
+              <span className="text-[9px] uppercase text-stone font-mono whitespace-nowrap">
+                {sizeLabel(category, s)}
+              </span>
               <input
                 type="number"
                 min="0"
