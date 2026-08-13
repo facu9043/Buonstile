@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { SIZES } from "../data/products";
+import { SIZES, sizeLabel } from "../data/products";
 import { fetchActiveProducts } from "../data/productsApi";
 import ProductCard from "../components/ProductCard";
 
@@ -40,6 +40,12 @@ export default function Catalogo() {
       .finally(() => setLoading(false));
   }, []);
 
+  const showSizeFilter = category !== "Accesorios";
+
+  useEffect(() => {
+    if (!showSizeFilter) setSizeFilter(null);
+  }, [showSizeFilter]);
+
   const filtered = useMemo(() => {
     return products.filter((p) => {
       if (category !== "Todos" && p.category !== category) return false;
@@ -59,13 +65,20 @@ export default function Catalogo() {
             <FilterChip key={c} label={c} active={category === c} onClick={() => setCategory(c)} />
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs uppercase tracking-wide mr-2 text-stone font-mono">Talle:</span>
-          <FilterChip label="Todos" active={sizeFilter === null} onClick={() => setSizeFilter(null)} />
-          {SIZES.map((s) => (
-            <FilterChip key={s} label={s} active={sizeFilter === s} onClick={() => setSizeFilter(s)} />
-          ))}
-        </div>
+        {showSizeFilter && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs uppercase tracking-wide mr-2 text-stone font-mono">Talle:</span>
+            <FilterChip label="Todos" active={sizeFilter === null} onClick={() => setSizeFilter(null)} />
+            {SIZES.map((s) => (
+              <FilterChip
+                key={s}
+                label={sizeLabel(category, s)}
+                active={sizeFilter === s}
+                onClick={() => setSizeFilter(s)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {loading ? (
