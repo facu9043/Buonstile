@@ -80,9 +80,15 @@ export default function Nosotros() {
       </section>
 
       <section className="max-w-6xl mx-auto w-full px-5 md:px-8 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
-        <div className="relative h-64 md:h-80 border border-ink flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: patternBg("cross") }} />
-          <MapPin size={44} className="relative text-ink" />
+        <div className="relative h-64 md:h-80 border border-ink overflow-hidden">
+          <iframe
+            title="Ubicacion Buonstile Indumentaria"
+            src={`https://www.google.com/maps?q=${encodeURIComponent(STORE_ADDRESS)}&output=embed`}
+            className="absolute inset-0 w-full h-full grayscale"
+            style={{ border: 0 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
         <div>
           <p className="text-xs tracking-[0.3em] uppercase mb-3 text-stone font-mono">Visitanos</p>
