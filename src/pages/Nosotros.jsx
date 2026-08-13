@@ -32,7 +32,7 @@ export default function Nosotros() {
           <h1 className="text-5xl md:text-7xl leading-[0.95] text-paper font-display">Somos Buonstile</h1>
           <p className="max-w-xl text-base md:text-lg text-[#C8C6BE] font-body">
             Un local de ropa urbana pensado para chicos y chicas de 18 a 30
-            anos, aunque nuestro estilo cruza generaciones. Te ayudamos a
+            años, aunque nuestro estilo cruza generaciones. Te ayudamos a
             lucir tu propio estilo con elegancia y flow rustico de calle.
           </p>
         </div>

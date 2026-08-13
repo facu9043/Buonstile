@@ -108,7 +108,7 @@ export default function Home() {
           <p className="text-xs tracking-[0.3em] uppercase mb-3 text-stone font-mono">Quienes somos</p>
           <h3 className="text-4xl md:text-5xl mb-5 text-ink font-display">Tu estilo, tu calle</h3>
           <p className="mb-6 leading-relaxed text-[#3A3A3A] font-body">
-            Somos un local pensado para chicos y chicas de 18 a 30 anos, aunque
+            Somos un local pensado para chicos y chicas de 18 a 30 años, aunque
             nuestro estilo cruza generaciones. Creemos que la ropa es una forma
             de expresarte, por eso elegimos prendas con actitud urbana, un
             toque rustico y esa elegancia informal que se lleva en la calle.
