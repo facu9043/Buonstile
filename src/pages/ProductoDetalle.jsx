@@ -15,9 +15,11 @@ export default function ProductoDetalle() {
   const [size, setSize] = useState(null);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     setProduct(undefined);
+    setActiveImage(0);
     fetchProductById(id)
       .then(setProduct)
       .catch(() => setProduct(null));
@@ -48,11 +50,31 @@ export default function ProductoDetalle() {
         <ArrowLeft size={15} /> Volver al catalogo
       </Link>
       <div className="grid md:grid-cols-2 gap-10">
-        <div className="relative h-80 md:h-[28rem] border border-ink bg-paper overflow-hidden">
-          <ProductImage image={product.image} pattern={product.pattern} alt={product.name} />
-          <span className="absolute top-4 left-4">
-            <StockBadge type={status} />
-          </span>
+        <div>
+          <div className="relative h-80 md:h-[28rem] border border-ink bg-paper overflow-hidden">
+            <ProductImage
+              image={product.images?.[activeImage] ?? product.image}
+              pattern={product.pattern}
+              alt={product.name}
+            />
+            <span className="absolute top-4 left-4">
+              <StockBadge type={status} />
+            </span>
+          </div>
+          {product.images?.length > 1 && (
+            <div className="flex gap-2 mt-3">
+              {product.images.map((url, i) => (
+                <button
+                  key={url}
+                  onClick={() => setActiveImage(i)}
+                  className="relative w-16 h-16 border overflow-hidden shrink-0"
+                  style={{ borderColor: activeImage === i ? "#0D0D0D" : "#DCDAD3", borderWidth: activeImage === i ? 2 : 1 }}
+                >
+                  <img src={url} alt={`${product.name} - foto ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div>
           <p className="text-xs tracking-widest uppercase mb-2 text-stone font-mono">{product.category}</p>

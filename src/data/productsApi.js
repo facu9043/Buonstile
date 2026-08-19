@@ -3,13 +3,19 @@ import { CATEGORIES, SIZES } from "./products";
 
 // Convierte una fila de la tabla "products" a la forma que ya usan
 // ProductCard/ProductImage/ProductoDetalle/CartContext (image, no image_url).
+// "images" es la galeria completa (frente, dorso, etc.); "image" sigue
+// existiendo como la foto de portada (la primera de la galeria) para no
+// tener que tocar los componentes que solo muestran una foto (tarjetas,
+// carrito).
 function mapRow(row) {
+  const images = Array.isArray(row.images) ? row.images : [];
   return {
     id: row.id,
     name: row.name,
     category: row.category,
     price: Number(row.price),
-    image: row.image_url,
+    image: images[0] ?? row.image_url ?? null,
+    images,
     pattern: row.pattern,
     stock: row.stock,
     active: row.active,
@@ -77,7 +83,9 @@ export async function toggleActive(id, active) {
   await updateProduct(id, { active });
 }
 
-export async function uploadProductImage(id, file) {
+// Sube una foto nueva y la agrega al final de la galeria del producto
+// (no reemplaza las que ya tenia).
+export async function addProductImage(id, file, currentImages = []) {
   const ext = file.name.split(".").pop();
   const path = `${id}-${Date.now()}.${ext}`;
 
@@ -87,6 +95,14 @@ export async function uploadProductImage(id, file) {
   if (uploadError) throw uploadError;
 
   const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-  await updateProduct(id, { image_url: data.publicUrl });
-  return data.publicUrl;
+  const images = [...currentImages, data.publicUrl];
+  await updateProduct(id, { images });
+  return images;
+}
+
+// Saca una foto puntual de la galeria del producto.
+export async function removeProductImage(id, url, currentImages = []) {
+  const images = currentImages.filter((u) => u !== url);
+  await updateProduct(id, { images });
+  return images;
 }

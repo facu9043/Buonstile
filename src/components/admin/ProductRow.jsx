@@ -1,18 +1,22 @@
 import React, { useRef, useState } from "react";
-import { Check, ToggleLeft, ToggleRight, UploadCloud, Loader2 } from "lucide-react";
+import { Check, ToggleLeft, ToggleRight, UploadCloud, Loader2, X } from "lucide-react";
 import ProductImage from "../ProductImage";
 import { SIZES, CATEGORIES, sizeLabel } from "../../data/products";
-import { updateProduct, toggleActive, uploadProductImage } from "../../data/productsApi";
+import { toggleActive, updateProduct, addProductImage, removeProductImage } from "../../data/productsApi";
+
+const MAX_IMAGES = 6;
 
 export default function ProductRow({ product, onUpdated }) {
   const [name, setName] = useState(product.name);
   const [category, setCategory] = useState(product.category);
   const [price, setPrice] = useState(String(product.price));
   const [stock, setStock] = useState({ ...product.stock });
+  const [images, setImages] = useState(product.images || []);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [removingUrl, setRemovingUrl] = useState(null);
   const [togglingActive, setTogglingActive] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -47,11 +51,12 @@ export default function ProductRow({ product, onUpdated }) {
   };
 
   const handleFile = async (file) => {
-    if (!file || !file.type.startsWith("image/")) return;
+    if (!file || !file.type.startsWith("image/") || images.length >= MAX_IMAGES) return;
     setUploading(true);
     try {
-      const url = await uploadProductImage(product.id, file);
-      onUpdated({ ...product, image: url });
+      const updatedImages = await addProductImage(product.id, file, images);
+      setImages(updatedImages);
+      onUpdated({ ...product, images: updatedImages, image: updatedImages[0] });
     } finally {
       setUploading(false);
     }
@@ -63,38 +68,75 @@ export default function ProductRow({ product, onUpdated }) {
     handleFile(e.dataTransfer.files?.[0]);
   };
 
+  const handleRemoveImage = async (url) => {
+    setRemovingUrl(url);
+    try {
+      const updatedImages = await removeProductImage(product.id, url, images);
+      setImages(updatedImages);
+      onUpdated({ ...product, images: updatedImages, image: updatedImages[0] ?? null });
+    } finally {
+      setRemovingUrl(null);
+    }
+  };
+
   return (
     <tr className="border-b border-line align-middle">
       <td className="p-3">
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-          className="relative w-16 h-16 border border-ink bg-paper overflow-hidden shrink-0 cursor-pointer"
-          style={{ outline: dragOver ? "2px dashed #0D0D0D" : "none" }}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              handleFile(e.target.files?.[0]);
-              e.target.value = "";
-            }}
-          />
-          <ProductImage image={product.image} pattern={product.pattern} alt={product.name} />
-          <div className="absolute inset-0 flex items-center justify-center bg-ink/0 hover:bg-ink/60 transition-colors group">
-            {uploading ? (
-              <Loader2 size={16} className="text-paper animate-spin" />
-            ) : (
-              <UploadCloud size={14} className="text-paper opacity-0 group-hover:opacity-100 transition-opacity" />
-            )}
-          </div>
+        <div className="flex flex-wrap gap-1.5 max-w-[9rem]">
+          {images.map((url) => (
+            <div key={url} className="relative w-12 h-12 border border-ink bg-paper overflow-hidden shrink-0 group">
+              <img src={url} alt={product.name} className="absolute inset-0 w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => handleRemoveImage(url)}
+                disabled={removingUrl === url}
+                aria-label="Quitar foto"
+                className="absolute inset-0 flex items-center justify-center bg-ink/0 hover:bg-ink/60 transition-colors"
+              >
+                {removingUrl === url ? (
+                  <Loader2 size={13} className="text-paper animate-spin" />
+                ) : (
+                  <X size={13} className="text-paper opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
+              </button>
+            </div>
+          ))}
+
+          {images.length === 0 && (
+            <div className="relative w-12 h-12 border border-ink bg-paper overflow-hidden shrink-0">
+              <ProductImage image={null} pattern={product.pattern} alt={product.name} />
+            </div>
+          )}
+
+          {images.length < MAX_IMAGES && (
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              className="relative w-12 h-12 flex items-center justify-center border border-dashed border-ink bg-paper shrink-0 cursor-pointer"
+              style={{ outline: dragOver ? "2px dashed #0D0D0D" : "none" }}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  handleFile(e.target.files?.[0]);
+                  e.target.value = "";
+                }}
+              />
+              {uploading ? (
+                <Loader2 size={14} className="text-ink animate-spin" />
+              ) : (
+                <UploadCloud size={14} className="text-ink" />
+              )}
+            </div>
+          )}
         </div>
       </td>
 

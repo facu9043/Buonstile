@@ -12,6 +12,7 @@ create table if not exists products (
   category text not null,
   price numeric not null,
   image_url text,
+  images jsonb not null default '[]',
   pattern text,
   stock jsonb not null default '{"S":0,"M":0,"L":0,"XL":0}',
   active boolean not null default true,
