@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { SITE_ID } from "../lib/site";
 import { CATEGORIES, SIZES } from "./products";
 
 // Convierte una fila de la tabla "products" a la forma que ya usan
@@ -27,6 +28,7 @@ export async function fetchActiveProducts() {
   const { data, error } = await supabase
     .from("products")
     .select("*")
+    .eq("site_id", SITE_ID)
     .eq("active", true)
     .order("id", { ascending: true });
   if (error) throw error;
@@ -37,6 +39,7 @@ export async function fetchProductById(id) {
   const { data, error } = await supabase
     .from("products")
     .select("*")
+    .eq("site_id", SITE_ID)
     .eq("id", id)
     .eq("active", true)
     .maybeSingle();
@@ -49,6 +52,7 @@ export async function fetchAllProducts() {
   const { data, error } = await supabase
     .from("products")
     .select("*")
+    .eq("site_id", SITE_ID)
     .order("id", { ascending: true });
   if (error) throw error;
   return data.map(mapRow);
@@ -61,6 +65,7 @@ export async function createProduct() {
   const { data, error } = await supabase
     .from("products")
     .insert({
+      site_id: SITE_ID,
       name: "Producto nuevo",
       category: CATEGORIES[0],
       price: 0,
@@ -75,7 +80,11 @@ export async function createProduct() {
 }
 
 export async function updateProduct(id, fields) {
-  const { error } = await supabase.from("products").update(fields).eq("id", id);
+  const { error } = await supabase
+    .from("products")
+    .update(fields)
+    .eq("site_id", SITE_ID)
+    .eq("id", id);
   if (error) throw error;
 }
 
@@ -87,7 +96,7 @@ export async function toggleActive(id, active) {
 // (no reemplaza las que ya tenia).
 export async function addProductImage(id, file, currentImages = []) {
   const ext = file.name.split(".").pop();
-  const path = `${id}-${Date.now()}.${ext}`;
+  const path = `${SITE_ID}/${id}-${Date.now()}.${ext}`;
 
   const { error: uploadError } = await supabase.storage
     .from("product-images")
